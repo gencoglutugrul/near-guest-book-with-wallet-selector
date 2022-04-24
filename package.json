@@ -1,74 +1,78 @@
 {
-  "name": "near-wallet-selector",
-  "version": "1.0.1",
-  "description": "This is a wallet modal that allows users to interact with NEAR dApps with a selection of available wallets.",
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "name": "wallet-selector-example",
+  "version": "0.1.0",
+  "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "build:esm": "tsc",
-    "build:cjs": "tsc --module commonjs --outDir lib/cjs",
-    "build": "yarn build:esm && yarn build:cjs",
+    "build": "parcel build src/index.html --public-url ./",
+    "start": "parcel src/index.html",
+    "start:dev": "parcel src/index.html",
+    "dev": "nodemon",
     "lint": "eslint ./src --ext .ts,.tsx",
     "lint:fix": "yarn lint --fix",
-    "test": "jest",
-    "test:e2e": "playwright test",
-    "prepack": "yarn build"
+    "test": "yarn build:contract:dev && asp && jest"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/near-projects/wallet-selector.git"
-  },
-  "keywords": [
-    "near",
-    "walletselector"
-  ],
-  "author": "near",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/near-projects/wallet-selector/issues"
-  },
-  "homepage": "https://github.com/near-projects/wallet-selector#readme",
   "devDependencies": {
-    "@ledgerhq/logs": "^6.10.0",
-    "@playwright/test": "^1.18.0",
-    "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "^12.1.2",
-    "@types/big.js": "^6.1.2",
-    "@types/bn.js": "^5.1.0",
-    "@types/bs58": "^4.0.1",
-    "@types/jest": "^27.4.0",
-    "@types/node": "^16.11.13",
-    "@types/w3c-web-hid": "^1.0.2",
-    "@types/w3c-web-usb": "^1.0.5",
-    "@typescript-eslint/eslint-plugin": "^5.10.1",
-    "@typescript-eslint/parser": "^5.10.1",
-    "eslint": "^8.7.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "jest": "^27.4.7",
-    "jest-mock-extended": "^2.0.4",
-    "playwright": "^1.18.0",
-    "ts-jest": "^27.1.3",
-    "ts-node": "^10.4.0",
-    "typescript": "^4.5.3"
+    "@babel/core": "^7.14.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-react": "^7.13.13",
+    "babel-jest": "^27.4.2",
+    "gh-pages": "^3.2.3",
+    "jest": "^26.6.3",
+    "jest-environment-node": "^26.6.2",
+    "near-cli": "^3.0.0",
+    "near-sdk-as": "3.2.3",
+    "nodemon": "^2.0.7",
+    "parcel-bundler": "^1.12.5",
+    "react-test-renderer": "^17.0.2",
+    "sass": "^1.44.0",
+    "typescript": "^4.5.2"
   },
   "dependencies": {
-    "@ledgerhq/hw-transport-webhid": "^6.20.0",
-    "@ledgerhq/hw-transport-webusb": "^6.20.0",
-    "@types/react": "^17.0.37",
-    "@types/react-dom": "^17.0.11",
-    "bn.js": "^5.2.0",
-    "bs58": "^4.0.1",
-    "eslint-plugin-react": "^7.28.0",
-    "eslint-plugin-react-hooks": "^4.3.0",
-    "is-mobile": "^3.0.0",
+    "@near-wallet-selector/near-wallet": "^3.0.2",
+    "@near-wallet-selector/sender": "^3.0.2",
+    "big.js": "^6.1.1",
+    "env-cmd": "^10.1.0",
     "near-api-js": "0.44.2",
-    "prettier": "^2.5.1",
+    "near-wallet-selector": "*",
+    "prop-types": "^15.7.2",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "regenerator-runtime": "^0.13.9"
   },
-  "files": [
-    "lib"
-  ]
+  "resolutions": {
+    "@babel/preset-env": "7.13.8"
+  },
+  "jest": {
+    "projects": [
+      {
+        "displayName": "User interface tests",
+        "testEnvironment": "jsdom",
+        "testMatch": [
+          "<rootDir>/src/tests/ui/*.js"
+        ]
+      },
+      {
+        "displayName": "Integration tests",
+        "testEnvironment": "near-cli/test_environment",
+        "testMatch": [
+          "<rootDir>/src/tests/integration/*.js"
+        ]
+      }
+    ],
+    "testPathIgnorePatterns": [
+      "assembly/*"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

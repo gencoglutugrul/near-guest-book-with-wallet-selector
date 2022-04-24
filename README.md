@@ -1,209 +1,116 @@
-# NEAR Wallet Selector
+Guest Book
+==========
 
-The NEAR Wallet Selector makes it easy for users to interact with your dApp. This package presents a modal to switch between a number of supported wallet types:
+[![Build Status](https://travis-ci.com/near-examples/guest-book.svg?branch=master)](https://travis-ci.com/near-examples/guest-book)
 
-- [NEAR Wallet](https://wallet.near.org/) - Web wallet.
-- [Sender Wallet](https://chrome.google.com/webstore/detail/sender-wallet/epapihdplajcdnnkdeiahlgigofloibg) - Browser extension wallet.
-- [Ledger](https://www.ledger.com/) - Hardware wallet.
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/near-examples/guest-book)
+
+<!-- MAGIC COMMENT: DO NOT DELETE! Everything above this line is hidden on NEAR Examples page -->
+
+Sign in with [NEAR] and add a message to the guest book! A starter app built with an [AssemblyScript] backend and a [React] frontend.
 
 
-## Preview 
-You can test the library on the [Guest Book](https://github.com/near-projects/wallet-selector/tree/dev/example) dApp which is located inside `/example`
+Quick Start
+===========
 
-![Preview](./src/images/preview-img.PNG)
+To run this project locally:
 
-## Installation and Usage
+1. Prerequisites: Make sure you have Node.js ≥ 12 installed (https://nodejs.org).
+2. Run the local development server: `npm install && npm run watch` (see `package.json` for a
+   full list of `scripts` you can run with `npm run <script>`)
 
-The easiest way to use `near-wallet-selector` is to install it from the NPM registry:
+Now you'll have a local development environment backed by the NEAR TestNet! Running `npm run watch` will tell you the URL you can visit in your browser to see the app.
 
-```bash
-# Using Yarn
-yarn add near-wallet-selector
 
-# Using NPM.
-npm install near-wallet-selector
-```
+Exploring The Code
+==================
 
-Then use it in your dApp:
+1. The backend code lives in the `/assembly` folder. This code gets deployed to
+   the NEAR blockchain when you run `npm run deploy:contract`. This sort of
+   code-that-runs-on-a-blockchain is called a "smart contract" – [learn more
+   about NEAR smart contracts][smart contract docs].
+2. The frontend code lives in the `/src` folder.
+   [/src/index.html](/src/index.html) is a great place to start exploring. Note
+   that it loads in `/src/index.js`, where you can learn how the frontend
+   connects to the NEAR blockchain.
+3. Tests: there are different kinds of tests for the frontend and backend. The
+   backend code gets tested with the [asp] command for running the backend
+   AssemblyScript tests, and [jest] for running frontend tests. You can run
+   both of these at once with `npm run test`.
 
-```ts
-import NearWalletSelector from "near-wallet-selector";
+Both contract and client-side code will auto-reload as you change source files.
 
-const near = new NearWalletSelector({
-  wallets: ["near-wallet", "sender-wallet", "ledger-wallet"],
-  networkId: "testnet",
-  theme: "light",
-  contract: {
-    accountId: "guest-book.testnet",
-    viewMethods: ["getMessages"],
-    changeMethods: ["addMessage"],
-  },
-  walletSelectorUI: {
-    description: "Please select a wallet to connect to this dApp:",
-    explanation: [
-      "Wallets are used to send, receive, and store digital assets.",
-      "There are different types of wallets. They can be an extension",
-      "added to your browser, a hardware device plugged into your",
-      "computer, web-based, or as an app on your phone.",
-    ].join(" "),
-  }
-});
-```
 
-## API Reference
+Deploy
+======
 
-Init:
+Every smart contract in NEAR has its [own associated account][NEAR accounts]. When you run `npm run watch`, your smart contracts get deployed to the live NEAR TestNet with a throwaway account. When you're ready to make it permanent, here's how.
 
-```ts
-await near.init();
-```
 
-Show modal:
+Step 0: Install near-cli
+--------------------------
 
-```ts
-near.show();
-```
+You need near-cli installed globally. Here's how:
 
-Hide modal:
+    npm install -g near-cli
 
-```ts
-near.hide();
-```
+This will give you the `near` [CLI] tool. Ensure that it's installed with:
 
-Sign in (programmatically):
+    near --version
 
-```ts
-await near.signIn("near-wallet");
-```
 
-Sign out:
+Step 1: Create an account for the contract
+------------------------------------------
 
-```ts
-await near.signOut();
-```
+Visit [NEAR Wallet] and make a new account. You'll be deploying these smart contracts to this new account.
 
-Is signed in:
+Now authorize NEAR CLI for this new account, and follow the instructions it gives you:
 
-```ts
-await near.isSignedIn();
-```
+    near login
 
-Get account:
 
-```ts
-const account = await near.getAccount();
-```
+Step 2: set contract name in code
+---------------------------------
 
-Add event listeners:
+Modify the line in `src/config.js` that sets the account name of the contract. Set it to the account id you used above.
 
-```ts
-near.on("signIn", () => {
-   // your code
-});
+    const CONTRACT_NAME = process.env.CONTRACT_NAME || 'your-account-here!'
 
-near.on("signOut", () => {
-  // your code
-});
-```
 
-Remove event listeners:
+Step 3: change remote URL if you cloned this repo 
+-------------------------
 
-```ts
-// Method 1:
-const subscription = near.on("signIn", () => {
-   // your code
-});
+Unless you forked this repository you will need to change the remote URL to a repo that you have commit access to. This will allow auto deployment to GitHub Pages from the command line.
 
-subscription.remove();
+1) go to GitHub and create a new repository for this project
+2) open your terminal and in the root of this project enter the following:
 
-// Method 2:
-const handleSignIn = () => {
-  // your code
-}
+    $ `git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git`
 
-near.on("signIn", handleSignIn);
-near.off("signIn", handleSignIn);
-```
 
-Interact with the Smart Contract:
+Step 4: deploy!
+---------------
 
-```ts
-// Retrieve messages via RPC endpoint (view method).
-const messages = await near.contract.view({ methodName: "getMessages" });
+One command:
 
-// Add a message, modifying the blockchain (change method).
-await near.contract.signAndSendTransaction({
-  actions: [{
-    type: "FunctionCall",
-    params: {
-      methodName: "addMessage",
-      args: {text: message.value},
-      gas: "30000000000000",
-      deposit: "10000000000000000000000"
-    }
-  }]
-});
+    npm run deploy
 
-// Retrieve contract accountId.
-const accountId = near.contract.getAccountId();
-```
+As you can see in `package.json`, this does two things:
 
-## Custom Themes
+1. builds & deploys smart contracts to NEAR TestNet
+2. builds & deploys frontend code to GitHub using [gh-pages]. This will only work if the project already has a repository set up on GitHub. Feel free to modify the `deploy` script in `package.json` to deploy elsewhere.
 
-If no value is provided for `theme` option then the theme will be picked by System's default mode/theme.
 
-There are two available themes `light` and `dark`:
 
-To use the `light` mode, add `theme` option with the value `light`
-
-```ts
-const near = new NearWalletSelector({
-  ...otherOptions,
-  theme: "light",
-});
-```
-
-To use the `dark` mode, add `theme` option with the value `dark`
-
-```ts
-const near = new NearWalletSelector({
-  ...otherOptions,
-  theme: "dark",
-});
-```
-## Custom/Optional UI Elements
-
-The `walletSelectorUI` option provides two properties which help to modify/customize the UI:
-
-- The `description` property if provided replaces the default description.
-- The `explanation` property if provided shows **What is a wallet?** section, if not provided there is no default wallet explanation the section will be hidden.
-
-```ts
-const near = new NearWalletSelector({
-  ...otherOptions,
-  walletSelectorUI: {
-    description: "Add your own description",
-    explanation: "Add your own wallet explanation",
-  }
-});
-```
-## Example Integration
-
-A variation of the [guest-book](https://github.com/near-examples/guest-book/)  example project can be found in the `example` directory. You can use this to gain a concrete understanding of how to integrate this package into your own dApp.
-
-Contributors to this package may also find this integration useful as it provides a quick and consistent way of manually testing new changes and/or bugs. Below is a common workflow you can use:
-
-- Execute `yarn link` in the root directory.
-- Navigate to the `example` directory.
-- Execute `yarn link near-wallet-selector` to create a symlink locally.
-- Execute `yarn watch` to watch both `src` directories and automatically recompile.
-
-## Editor Setup
-
-This project uses [ESLint](https://eslint.org/) (with [Prettier](https://prettier.io/)) to enforce a consistent coding style. It's important that you configure your editor correctly to avoid issues when you're ready to open a Pull Request.
-
-Although this project uses Prettier, it's simply an "internal" dependency to our ESLint configuration. This is because we want Prettier to handle code styling while avoiding conflicts with ESLint which specifically focuses on potentially problematic code. As a result, **it's important that you switch off Prettier in your editor and ensure only ESLint is enabled**.
-
-## License
-
-This repository is distributed under the terms of both the MIT license and the Apache License (Version 2.0). See [LICENSE-MIT](LICENSE-MIT) and [LICENSE-APACHE](LICENSE-APACHE) for details.
+  [NEAR]: https://near.org/
+  [AssemblyScript]: https://www.assemblyscript.org/introduction.html
+  [React]: https://reactjs.org
+  [smart contract docs]: https://docs.near.org/docs/develop/contracts/overview
+  [asp]: https://www.npmjs.com/package/@as-pect/cli
+  [jest]: https://jestjs.io/
+  [NEAR accounts]: https://docs.near.org/docs/concepts/account
+  [NEAR Wallet]: https://wallet.near.org
+  [near-cli]: https://github.com/near/near-cli
+  [CLI]: https://www.w3schools.com/whatis/whatis_cli.asp
+  [create-near-app]: https://github.com/near/create-near-app
+  [gh-pages]: https://github.com/tschaub/gh-pages

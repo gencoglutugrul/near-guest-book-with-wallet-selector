@@ -1,0 +1,10 @@
+{
+  "watch": [
+    "./src/"
+  ],
+  "ext": "tsx,ts,js",
+  "ignore": [
+    "dist"
+  ],
+  "exec": "yarn start:dev"
+}

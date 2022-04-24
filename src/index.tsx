@@ -11,9 +11,9 @@ async function initContract() {
   const nearConfig = getConfig(process.env.NEAR_ENV || "testnet");
 
   const selector = new NearWalletSelector({
-    wallets: ["near-wallet", "sender-wallet", "ledger-wallet"],
+    wallets: ["near-wallet", "sender-wallet"],
     networkId: "testnet",
-    theme: "light",
+    theme: "dark",
     contract: {
       accountId: nearConfig.contractName,
     },
